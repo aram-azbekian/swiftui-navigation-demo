@@ -24,9 +24,14 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $viewModel.selectedTab) {
-            Text("Tab Content 1")
-                .tabItem { Text("One") }
-                .tag(Tab.one)
+            VStack {
+                Text("Tab Content 1")
+                Button { viewModel.selectedTab = .two } label: {
+                    Text("Go to Tab 2")
+                }
+            }
+            .tabItem { Text("One") } 
+            .tag(Tab.one)
             Text("Tab Content 2")
                 .tabItem { Text("Two") }
                 .tag(Tab.two)
