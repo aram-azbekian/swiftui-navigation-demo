@@ -7,15 +7,13 @@
 
 import SwiftUI
 
-enum Tab {
-    case one, two, three
-}
-
 class AppViewModel: ObservableObject {
     @Published var selectedTab: Tab = .one
+    @Published var errorMsg: ErrorMessage?
     
-    init(selectedTab: Tab = .one) {
+    init(selectedTab: Tab = .one, errorMsg: ErrorMessage? = nil) {
         self.selectedTab = selectedTab
+        self.errorMsg = errorMsg
     }
 }
 
@@ -30,11 +28,34 @@ struct ContentView: View {
                     Text("Go to Tab 2")
                 }
             }
-            .tabItem { Text("One") } 
+            .tabItem { Text("One") }
             .tag(Tab.one)
-            Text("Tab Content 2")
-                .tabItem { Text("Two") }
-                .tag(Tab.two)
+            
+            VStack {
+                Text("Tab Content 2")
+                Button { viewModel.errorMsg = ErrorMessage(desc: "Unauthorized Error", actionText: "Log in") } label: {
+                    Text("Present alert #1")
+                }
+                Button { viewModel.errorMsg = ErrorMessage(desc: "Connection lost", actionText: "Try again") } label: {
+                    Text("Present alert #2")
+                }
+            }
+            .alert(
+                "Error",
+                data: $viewModel.errorMsg,
+                actions: { msg in
+                    Button(msg.actionText) {
+                        // do something
+                    }
+                    
+                    Button("Cancel", role: .cancel) { }
+                },
+                message: { msg in
+                    Text(msg.desc)
+                })
+            .tabItem { Text("Two") }
+            .tag(Tab.two)
+            
             Text("Tab Content 3")
                 .tabItem { Text("Three") }
                 .tag(Tab.three)
@@ -43,5 +64,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(viewModel: .init(selectedTab: .two))
+    ContentView(viewModel: .init(selectedTab: .two, errorMsg: .init(desc: "Loading failed", actionText: "Load again")))
 }
